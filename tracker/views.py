@@ -11,6 +11,7 @@ from .forms import BookUpdateForm
 class BaseBookListView(ListView):
     model = Book
     context_object_name = "books"
+    paginate_by = 20
 
     def build_filters(self):
         filters = Q()

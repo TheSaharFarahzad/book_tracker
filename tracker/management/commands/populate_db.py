@@ -131,7 +131,7 @@ class Command(BaseCommand):
 
         # Populate Books
         book_factory = BookFactory(faker, start_date=datetime(1900, 1, 1))
-        books = book_factory.create_books(authors=authors, genres=genres, count=1000)
+        books = book_factory.create_books(authors=authors, genres=genres, count=10_000)
         populator.populate(books, Book)
 
         # Assign genres to books
