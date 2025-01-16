@@ -1,7 +1,7 @@
 from django.views.generic import ListView, UpdateView, View
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Book, Genre, Author
@@ -59,6 +59,7 @@ class HomeView(BaseBookListView):
     def get_queryset(self):
         return (
             Book.objects.filter(self.build_filters())
+            .annotate(user_count=Count("users"))
             .select_related("author")
             .prefetch_related("genres")
             .defer("start_date", "end_date", "notes", "rating")

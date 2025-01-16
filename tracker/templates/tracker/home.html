@@ -41,6 +41,12 @@
                 </a>
             </th>
             <th>Genre</th>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=user_count&sort_order={% if current_filters.sort == 'user_count' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Popularity<span class="sort-icon">⇅</span>
+                </a>
+            </th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -54,6 +60,7 @@
                 {{ genre.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </td>
+            <td>{{ book.user_count }}</td>
             <td>
                 {% if user.is_authenticated %}
                 {% if book in user_books %}
