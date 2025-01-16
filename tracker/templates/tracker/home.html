@@ -1,0 +1,83 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+<h2>All Books (Ranked by Popularity)</h2>
+<h3>Total Books: {{ total_books_count }}</h3>
+
+<form method="get" action="" class="search-form">
+    <input type="text" name="search" placeholder="Search books..." value="{{ current_filters.search }}">
+
+    <select name="author">
+        <option value="">Select Author</option>
+        {% for author in authors %}
+        <option value="{{ author.name }}">{{ author.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="genre">
+        <option value="">Select Genre</option>
+        {% for genre in genres %}
+        <option value="{{ genre.name }}">{{ genre.name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="button">Apply</button>
+</form>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=title&sort_order={% if current_filters.sort == 'title' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Title<span class="sort-icon">⇅</span>
+                </a>
+            </th>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=author__name&sort_order={% if current_filters.sort == 'author__name' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Author<span class="sort-icon">⇅</span>
+                </a>
+            </th>
+            <th>Genre</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author.name }}</td>
+            <td>
+                {% for genre in book.genres.all %}
+                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>
+                {% if user.is_authenticated %}
+                {% if book in user_books %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="action" value="remove">
+                    <button type="submit" class="btn btn-delete">Remove</button>
+                </form>
+                {% else %}
+                <form method="post" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                    <input type="hidden" name="action" value="add">
+                    <button type="submit" class="btn btn-add">Add</button>
+                </form>
+                {% endif %}
+                {% else %}
+                <span>Login to manage books</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

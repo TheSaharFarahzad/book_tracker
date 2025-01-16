@@ -1,0 +1,85 @@
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+<h2>My Book List</h2>
+<h3>Total Books: {{ total_books_count }}</h3>
+
+<form method="get" action="" class="search-form">
+    <input type="text" name="search" placeholder="Search books..." value="{{ current_filters.search }}">
+
+    <select name="author">
+        <option value="">Select Author</option>
+        {% for author in authors %}
+        <option value="{{ author.name }}">{{ author.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="genre">
+        <option value="">Select Genre</option>
+        {% for genre in genres %}
+        <option value="{{ genre.name }}">{{ genre.name }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="status">
+        <option value="">Select Status</option>
+        {% for status in statuses %}
+        <option value="{{ status.0 }}">{{ status.1 }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit" class="button">Apply</button>
+</form>
+
+
+<table>
+    <thead>
+        <tr>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=title&sort_order={% if current_filters.sort == 'title' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Title<span class="sort-icon">⇅</span>
+                </a>
+            </th>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=author__name&sort_order={% if current_filters.sort == 'author__name' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Author<span class="sort-icon">⇅</span>
+                </a>
+            </th>
+            <th>Genres</th>
+            <th>
+                <a class="table-sort"
+                    href="?{% for key, value in current_filters.items %}{% if key != 'sort' and key != 'sort_order' %}{{ key }}={{ value }}&{% endif %}{% endfor %}sort=status&sort_order={% if current_filters.sort == 'status' and current_filters.sort_order == 'asc' %}desc{% else %}asc{% endif %}">
+                    Status<span class="sort-icon">⇅</span>
+                </a>
+            </th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author.name }}</td>
+            <td>
+                {% for genre in book.genres.all %}
+                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td>{{ book.status }}</td>
+            <td>
+                <form method="post" action="{% url 'tracker:remove_from_list' book.pk %}" class="inline-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-delete"
+                        onclick="return confirm('Are you sure you want to remove this book?');">Remove</button>
+                </form>
+
+                <a href="{% url 'tracker:update_status' book.pk %}" class="btn btn-edit">Update</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

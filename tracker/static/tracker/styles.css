@@ -1,0 +1,250 @@
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background: #007BFF;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+nav {
+    margin-top: 0.5rem;
+}
+
+.nav-link,
+.btn-link {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+    padding: 5px 10px;
+    border: 1px solid #fff;
+    border-radius: 5px;
+}
+
+.nav-link:hover,
+.btn-link:hover {
+    background: #0056b3;
+    border-color: #0056b3;
+}
+
+main {
+    padding: 2rem;
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+table thead {
+    background: #007BFF;
+    color: #fff;
+}
+
+table th,
+table td {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+
+table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+/* Sortable Table Styles */
+.table-sort {
+    color: #fff;
+    text-decoration: none;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+}
+
+.table-sort .sort-icon {
+    margin-left: 5px;
+    display: inline;
+}
+
+.table-sort:hover .sort-icon {
+    color: #fff;
+}
+
+.table-sort[data-sort-order="default"] .sort-icon {
+    content: "⇅";
+}
+
+/* Button Styles */
+.btn {
+    display: inline-block;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    color: #fff;
+    margin: 2px;
+}
+
+.btn-edit {
+    background: #28a745;
+}
+
+.btn-delete {
+    background: #dc3545;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.btn-add {
+    background: #007BFF;
+    margin-top: 1rem;
+    display: inline-block;
+    text-align: center;
+}
+
+/* Search Form Styles */
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.search-form input {
+    flex-grow: 1;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-width: 150px;
+}
+
+.search-form select {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: auto;
+    flex-shrink: 0;
+}
+
+.search-form button {
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.search-form button:hover {
+    background-color: #0056b3;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    list-style: none;
+    padding: 0;
+}
+
+.pagination li {
+    margin: 0 5px;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 8px 16px;
+    text-decoration: none;
+    background-color: #007bff;
+    color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination .active span {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination a:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+}
+
+.pagination .disabled span {
+    background-color: #f2f2f2;
+    color: #ccc;
+    border-color: #ccc;
+    pointer-events: none;
+}
+
+.pagination li a {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.pagination li a,
+.pagination span {
+    padding: 10px 15px;
+    margin: 0 5px;
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    padding: 1rem 0;
+    background: #333;
+    color: #fff;
+    margin-top: 2rem;
+}
+
+/* Media Query for Responsive Design */
+@media screen and (max-width: 768px) {
+
+    table th,
+    table td {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    table td {
+        padding: 10px;
+    }
+
+    table tr {
+        margin-bottom: 10px;
+    }
+}
