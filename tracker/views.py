@@ -1,6 +1,7 @@
 from django.views.generic import ListView, UpdateView, View
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.db.models import Q
 from django.http import Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Book, Genre, Author
@@ -12,15 +13,15 @@ class BaseBookListView(ListView):
     context_object_name = "books"
 
     def build_filters(self):
-        filters = {}
+        filters = Q()
         if search_query := self.request.GET.get("search"):
-            filters["title__icontains"] = search_query
+            filters &= Q(title__icontains=search_query)
         if author_name := self.request.GET.get("author"):
-            filters["author__name__icontains"] = author_name
+            filters &= Q(author__name__icontains=author_name)
         if genre_name := self.request.GET.get("genre"):
-            filters["genres__name__icontains"] = genre_name
+            filters &= Q(genres__name__icontains=genre_name)
         if status_filter := self.request.GET.get("status"):
-            filters["status"] = status_filter
+            filters &= Q(status=status_filter)
         return filters
 
     def get_ordering(self):
@@ -55,17 +56,15 @@ class HomeView(BaseBookListView):
     template_name = "tracker/home.html"
 
     def get_queryset(self):
-        filters = self.build_filters()
         return (
-            Book.objects.filter(**filters)
+            Book.objects.filter(self.build_filters())
             .select_related("author")
             .prefetch_related("genres")
             .order_by(self.get_ordering())
         )
 
     def get_total_books_count(self):
-        filters = self.build_filters()
-        return Book.objects.filter(**filters).count()
+        return Book.objects.filter(self.build_filters()).count()
 
     def get_user_books(self):
         if self.request.user.is_authenticated:
@@ -99,10 +98,9 @@ class BookListView(LoginRequiredMixin, BaseBookListView):
     template_name = "tracker/book_list.html"
 
     def get_queryset(self):
-        filters = self.build_filters()
         return (
             Book.objects.filter(users=self.request.user)
-            .filter(**filters)
+            .filter(self.build_filters())
             .distinct()
             .select_related("author")
             .prefetch_related("genres")
@@ -110,9 +108,8 @@ class BookListView(LoginRequiredMixin, BaseBookListView):
         )
 
     def get_total_books_count(self):
-        return Book.objects.filter(
-            users=self.request.user, **self.build_filters()
-        ).count()
+        filters = Q(users=self.request.user) & self.build_filters()
+        return Book.objects.filter(filters).count()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
