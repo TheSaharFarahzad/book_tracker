@@ -32,14 +32,22 @@ class HomeView(BaseBookListView):
     template_name = "tracker/home.html"
 
     def get_queryset(self):
-        return Book.objects.all().order_by(self.get_ordering())
+        return (
+            Book.objects.select_related("author")
+            .prefetch_related("genres")
+            .order_by(self.get_ordering())
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        books_count = Book.objects.all().count()
+        books_count = Book.objects.count()
         context["total_books_count"] = books_count
         context["user_books"] = (
-            self.request.user.books.all() if self.request.user.is_authenticated else []
+            self.request.user.books.all()
+            .select_related("author")
+            .prefetch_related("genres")
+            if self.request.user.is_authenticated
+            else []
         )
         return context
 
@@ -67,6 +75,8 @@ class BookListView(LoginRequiredMixin, BaseBookListView):
         return (
             Book.objects.filter(users=self.request.user)
             .distinct()
+            .select_related("author")
+            .prefetch_related("genres")
             .order_by(self.get_ordering())
         )
 
@@ -86,7 +96,10 @@ class UpdateStatusView(LoginRequiredMixin, UpdateView):
         return reverse_lazy("tracker:book_list")
 
     def get_object(self, queryset=None):
-        return get_object_or_404(Book, pk=self.kwargs["pk"])
+        return get_object_or_404(
+            Book.objects.select_related("author").prefetch_related("genres"),
+            pk=self.kwargs["pk"],
+        )
 
 
 class RemoveFromListView(LoginRequiredMixin, View):
