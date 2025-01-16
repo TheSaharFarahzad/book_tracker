@@ -60,6 +60,7 @@ class HomeView(BaseBookListView):
             Book.objects.filter(self.build_filters())
             .select_related("author")
             .prefetch_related("genres")
+            .defer("start_date", "end_date", "notes", "rating")
             .order_by(self.get_ordering())
         )
 
@@ -104,6 +105,7 @@ class BookListView(LoginRequiredMixin, BaseBookListView):
             .distinct()
             .select_related("author")
             .prefetch_related("genres")
+            .defer("start_date", "end_date", "notes", "rating")
             .order_by(self.get_ordering())
         )
 
