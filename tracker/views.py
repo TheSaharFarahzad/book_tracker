@@ -11,10 +11,32 @@ class BaseBookListView(ListView):
     model = Book
     context_object_name = "books"
 
+    def build_filters(self):
+        filters = {}
+        if search_query := self.request.GET.get("search"):
+            filters["title__icontains"] = search_query
+        if author_name := self.request.GET.get("author"):
+            filters["author__name__icontains"] = author_name
+        if genre_name := self.request.GET.get("genre"):
+            filters["genres__name__icontains"] = genre_name
+        if status_filter := self.request.GET.get("status"):
+            filters["status"] = status_filter
+        return filters
+
     def get_ordering(self):
         sort = self.request.GET.get("sort", "title")
         sort_order = self.request.GET.get("sort_order", "asc")
         return f"{'-' if sort_order == 'desc' else ''}{sort}"
+
+    def get_current_filters(self):
+        return {
+            "search": self.request.GET.get("search", ""),
+            "author": self.request.GET.get("author", ""),
+            "genre": self.request.GET.get("genre", ""),
+            "status": self.request.GET.get("status", ""),
+            "sort": self.request.GET.get("sort", "title"),
+            "sort_order": self.request.GET.get("sort_order", "asc"),
+        }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -23,6 +45,7 @@ class BaseBookListView(ListView):
                 "authors": Author.objects.all(),
                 "genres": Genre.objects.all(),
                 "statuses": Book.STATUS_CHOICES,
+                "current_filters": self.get_current_filters(),
             }
         )
         return context
@@ -32,23 +55,27 @@ class HomeView(BaseBookListView):
     template_name = "tracker/home.html"
 
     def get_queryset(self):
+        filters = self.build_filters()
         return (
-            Book.objects.select_related("author")
+            Book.objects.filter(**filters)
+            .select_related("author")
             .prefetch_related("genres")
             .order_by(self.get_ordering())
         )
 
+    def get_total_books_count(self):
+        filters = self.build_filters()
+        return Book.objects.filter(**filters).count()
+
+    def get_user_books(self):
+        if self.request.user.is_authenticated:
+            return self.request.user.books.all()
+        return []
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        books_count = Book.objects.count()
-        context["total_books_count"] = books_count
-        context["user_books"] = (
-            self.request.user.books.all()
-            .select_related("author")
-            .prefetch_related("genres")
-            if self.request.user.is_authenticated
-            else []
-        )
+        context["total_books_count"] = self.get_total_books_count()
+        context["user_books"] = self.get_user_books()
         return context
 
     def post(self, request, *args, **kwargs):
@@ -72,18 +99,24 @@ class BookListView(LoginRequiredMixin, BaseBookListView):
     template_name = "tracker/book_list.html"
 
     def get_queryset(self):
+        filters = self.build_filters()
         return (
             Book.objects.filter(users=self.request.user)
+            .filter(**filters)
             .distinct()
             .select_related("author")
             .prefetch_related("genres")
             .order_by(self.get_ordering())
         )
 
+    def get_total_books_count(self):
+        return Book.objects.filter(
+            users=self.request.user, **self.build_filters()
+        ).count()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user_books_count = Book.objects.filter(users=self.request.user).count()
-        context["total_books_count"] = user_books_count
+        context["total_books_count"] = self.get_total_books_count()
         return context
 
 
