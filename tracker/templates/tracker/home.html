@@ -3,6 +3,7 @@
 {% block content %}
 <h2>All Books (Ranked by Popularity)</h2>
 <h3>Total Books: {{ total_books_count }}</h3>
+<h3>Total Users: {{ total_users_count }}</h3>
 
 <form method="get" action="" class="search-form">
     <input type="text" name="search" placeholder="Search books..." value="{{ current_filters.search }}">

@@ -56,6 +56,10 @@ class BaseBookListView(ListView):
 class HomeView(BaseBookListView):
     template_name = "tracker/home.html"
 
+    def get_total_users(self):
+        result = Book.objects.aggregate(total_users=Count("users", distinct=True))
+        return result["total_users"]
+
     def get_queryset(self):
         return (
             Book.objects.filter(self.build_filters())
@@ -77,6 +81,7 @@ class HomeView(BaseBookListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["total_books_count"] = self.get_total_books_count()
+        context["total_users_count"] = self.get_total_users()
         context["user_books"] = self.get_user_books()
         return context
 
